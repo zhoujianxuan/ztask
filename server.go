@@ -1,11 +1,11 @@
-package server
+package ztask
 
 import (
 	"context"
 	"log"
-	"ztask/tasks"
 
 	"github.com/hibiken/asynq"
+	"github.com/zhoujianxuan/ztask/tasks"
 )
 
 type Server struct {
@@ -13,7 +13,6 @@ type Server struct {
 }
 
 func NewServer(srv *asynq.Server) *Server {
-	tasks.InitTasks()
 	return &Server{Srv: srv}
 }
 
