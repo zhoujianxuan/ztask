@@ -1,4 +1,4 @@
-module ztask
+module github.com/zhoujianxuan/ztask
 
 go 1.15
 
