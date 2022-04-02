@@ -5,20 +5,40 @@ import (
 	"log"
 
 	"github.com/hibiken/asynq"
-	"github.com/zhoujianxuan/ztask/tasks"
 )
 
 type Server struct {
 	Srv *asynq.Server
 }
 
-func NewServer(srv *asynq.Server) *Server {
-	return &Server{Srv: srv}
+func NewServer(r asynq.RedisConnOpt, cfg asynq.Config) *Server {
+	return &Server{Srv: asynq.NewServer(r, cfg)}
+}
+
+type EasyParam struct {
+	Addr     string
+	Password string
+	DB       int
+}
+
+func NewEasyServer(param EasyParam) *Server {
+	return NewServer(asynq.RedisClientOpt{
+		Addr:     param.Addr,
+		Password: param.Password,
+		DB:       param.DB,
+	}, asynq.Config{
+		Concurrency: 1,
+		Queues: map[string]int{
+			"critical": 6,
+			"default":  3,
+			"low":      1,
+		},
+	})
 }
 
 func (s *Server) Run(ctx context.Context) {
 	mux := asynq.NewServeMux()
-	tasks.TaskHandle(mux)
+	TaskHandle(mux)
 
 	go func() {
 		if r := recover(); r != nil {
@@ -28,7 +48,6 @@ func (s *Server) Run(ctx context.Context) {
 			log.Fatalf("could not run server: %v", err)
 		}
 	}()
-
 	select {
 	case <-ctx.Done():
 		s.Srv.Shutdown()

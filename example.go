@@ -1,4 +1,4 @@
-package tasks
+package ztask
 
 import (
 	"context"
@@ -28,11 +28,13 @@ func NewDynamicConfigTask(gameID, source, configName string) (*asynq.Task, error
 
 type DynamicConfigProcessor struct{}
 
-func (processor *DynamicConfigProcessor) ProcessTask(ctx context.Context, t *asynq.Task) error {
+func (processor *DynamicConfigProcessor) ProcessTask(_ context.Context, t *asynq.Task) error {
 	var p DynamicConfigPayload
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
+
+	fmt.Println(p.GameID, p.Source, p.ConfigName)
 	return nil
 }
 
