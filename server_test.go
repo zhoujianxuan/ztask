@@ -9,7 +9,6 @@ func TestServer(t *testing.T) {
 	RegisterAsynqTask(TypeDynamicConfig, &DynamicConfigProcessor{})
 	ser := NewEasyServer(EasyParam{Addr: "127.0.0.1:6379"})
 
-	RegisterAsynqTask(TypeDynamicConfig, NewDynamicConfigProcessor())
 	ctx := context.TODO()
 	ser.Run(ctx)
 	select {
